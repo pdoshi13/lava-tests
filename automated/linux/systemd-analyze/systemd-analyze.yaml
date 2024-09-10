@@ -1,0 +1,32 @@
+# SPDX-License-Identifier: GPL-2.0-only
+# Copyright (C) 2024 Linaro Ltd.
+metadata:
+    format: Lava-Test Test Definition 1.0
+    name: systemd-analyze
+    description: |
+        systemd-analyze may be used to determine system boot-up performance
+        statistics and retrieve other state and tracing information from the
+        system and service manager, and to verify the correctness of unit
+        files. It is also used to access special functions useful for advanced
+        system manager debugging.
+    maintainer:
+        - anders.roxell@linaro.org
+    os:
+        - debian
+        - ubuntu
+        - fedora
+        - centos
+        - openembedded
+    scope:
+        - boot performance
+    devices:
+        - all
+
+params:
+    SKIP_INSTALL: true
+
+run:
+    steps:
+        - cd ./automated/linux/systemd-analyze/
+        - ./systemd-analyze.sh -s "${SKIP_INSTALL}"
+        - ../../utils/send-to-lava.sh ./output/result.txt

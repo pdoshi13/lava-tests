@@ -1,0 +1,3 @@
+[pacman]
+callback_program = "/var/sota/aklite-callback.sh"
+
