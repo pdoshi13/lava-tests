@@ -44,12 +44,11 @@ usage() {
                     [-S kselftest-skipfile]
                     [-b board]
                     [-g branch]
-                    [-e environment]
-                    [-E ENV_NAME=ENV_VAL]" 1>&2
+                    [-e environment]" 1>&2
     exit 1
 }
 
-while getopts "i:n:c:T:t:s:u:p:L:S:b:g:e:E:h" opt; do
+while getopts "i:n:c:T:t:s:u:p:L:S:b:g:e:h" opt; do
     case "${opt}" in
         i) SHARD_INDEX="${OPTARG}" ;;
         n) SHARD_NUMBER="${OPTARG}" ;;
@@ -108,13 +107,6 @@ while getopts "i:n:c:T:t:s:u:p:L:S:b:g:e:E:h" opt; do
         e)
             export ENVIRONMENT="${OPTARG}"
             ;;
-        E)
-            if [ -n "${OPTARG}" ]; then
-                set -x
-                eval "export ${OPTARG}"
-                set +x
-            fi
-            ;;
         h|*) usage ;;
     esac
 done
@@ -143,7 +135,7 @@ install() {
     dist_name
     # shellcheck disable=SC2154
     case "${dist}" in
-        debian|ubuntu) install_deps "sed perl wget xz-utils iproute2 python3-tap" "${SKIP_INSTALL}" ;;
+        debian|ubuntu|elxr) install_deps "sed perl wget xz-utils iproute2 python3-tap" "${SKIP_INSTALL}" ;;
         centos|fedora) install_deps "sed perl wget xz iproute" "${SKIP_INSTALL}" ;;
         unknown) warn_msg "Unsupported distro: package install skipped" ;;
     esac
@@ -158,15 +150,13 @@ install
 if [ -d "${KSELFTEST_PATH}" ]; then
     echo "kselftests found on rootfs"
     # shellcheck disable=SC2164
-    cd "${KSELFTEST_PATH}" || exit
 else
     # Fetch whatever we have been aimed at, assuming only that it can
     # be handled by "tar". Do not assume anything about the compression.
     wget "${TESTPROG_URL}" -O "${TESTPROG}"
-    tar -xaf "${TESTPROG}"
-    # shellcheck disable=SC3044
-    if [ ! -e "run_kselftest.sh" ]; then cd "kselftest" || exit; fi
+    mkdir -p /opt; tar -xaf "${TESTPROG}" -C /opt
 fi
+cd "${KSELFTEST_PATH}" || exit
 
 skips=$(mktemp -p . -t skip-XXXXXX)
 

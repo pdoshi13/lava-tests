@@ -43,7 +43,7 @@ install() {
         dist_name
         # shellcheck disable=SC2154
         case "${dist}" in
-          debian|ubuntu)
+          debian|ubuntu|elxr)
             pkgs="fio"
             install_deps "${pkgs}" "${SKIP_INSTALL}"
             ;;
@@ -76,7 +76,7 @@ fio_test() {
 
     # Parse output.
     cat "${file}"
-    measurement=$(grep -m 1 "iops=" "${file}" | cut -d= -f4 | cut -d, -f1)
+    measurement=$(grep -m 1 "iops" "${file}" | cut -d= -f4 | cut -d, -f1)
     add_metric "fio-${rw}" "pass" "${measurement}" "iops"
 
     # Delete files created by fio to avoid out of space.

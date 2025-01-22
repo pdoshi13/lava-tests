@@ -4,7 +4,10 @@
 . ../../lib/sh-test-lib
 OUTPUT="$(pwd)/output"
 RESULT_FILE="${OUTPUT}/result.txt"
+LOG_FILE="${OUTPUT}/output.txt"
 export RESULT_FILE
+create_out_dir "${OUTPUT}"
+
 ITERATION="5"
 
 usage() {
@@ -27,43 +30,41 @@ while getopts "p:t:i:s:" o; do
   esac
 done
 
+install() {
+    dist_name
+    case "${dist}" in
+      debian|ubuntu|elxr) install_deps "e2fsprogs dosfstools" "${SKIP_INSTALL}";;
+      unknown) warn_msg "Unsupported distro: package install skipped" ;;
+    esac
+}
+
 prepare_partition() {
     if [ -n "${PARTITION}" ]; then
         device_attribute="$(blkid | grep "${PARTITION}")"
-        [ -z "${device_attribute}" ] && error_msg "${PARTITION} NOT found"
+        [ -z "${device_attribute}" ] && {
+            echo "y" | mkfs -t vfat -F 32 "${PARTITION}"
+            device_attribute="$(blkid | grep "${PARTITION}")"
+        }
+
         fs_type=$(echo "${device_attribute}" \
             | grep "TYPE=" \
-            | awk '{print $3}' \
+            | awk '{print $4}' \
             | awk -F '"' '{print $2}')
 
         # If PARTITION specified, its FS_TYPE needs to be specified explicitly.
         [ -z "${FS_TYPE}" ] && \
             error_msg "Please specify ${PARTITION} filesystem with -t"
+        umount "${PARTITION}" &>/dev/null
+        format_partitions "${PARTITION}" "${FS_TYPE}"
 
-        # Try to format the partition if it is unformatted or not the same as
-        # the filesystem type specified with parameter '-t'.
-        if [ -n "${FS_TYPE}" ]; then
-            if [ "${FS_TYPE}" != "${fs_type}" ]; then
-                umount "${PARTITION}" > /dev/null 2>&1
-                info_msg "Formatting ${PARTITION} to ${FS_TYPE}..."
-
-                if [ "${FS_TYPE}" = "fat32" ]; then
-                    echo "y" | mkfs -t vfat -F 32 "${PARTITION}"
-                else
-                    echo "y" | mkfs -t "${FS_TYPE}" "${PARTITION}"
-                fi
-                info_msg "${PARTITION} formatted to ${FS_TYPE}"
-            fi
+        # Mount the partition and enter its mount point.
+        mount_point="$(df |grep "${PARTITION}" | awk '{print $NF}')"
+        if [ -z "${mount_point}" ]; then
+            mount_point="/mnt"
+            mount "${PARTITION}" "${mount_point}"
+            info_msg "${PARTITION} mounted to ${mount_point}"
         fi
-
-         # Mount the partition and enter its mount point.
-         mount_point="$(df |grep "${PARTITION}" | awk '{print $NF}')"
-         if [ -z "${mount_point}" ]; then
-             mount_point="/mnt"
-             mount "${PARTITION}" "${mount_point}"
-             info_msg "${PARTITION} mounted to ${mount_point}"
-         fi
-         cd "${mount_point}"
+        cd "${mount_point}"
     fi
 }
 
@@ -135,19 +136,15 @@ parse_output() {
     fi
 }
 
+install
+
 # Test run.
-! check_root && error_msg "This script must be run as root"
-create_out_dir "${OUTPUT}"
-
-info_msg "About to run dd test..."
-info_msg "Output directory: ${OUTPUT}"
-
-pkgs="e2fsprogs dosfstools"
-install_deps "${pkgs}" "${SKIP_INSTALL}"
-
-prepare_partition
-info_msg "dd test directory: $(pwd)"
-dd_write
-parse_output "dd-write"
-dd_read
-parse_output "dd-read"
+echo && {
+    ! check_root && error_msg "This script must be run as root"
+    prepare_partition
+    info_msg "dd test directory: $(pwd)"
+    dd_write 
+    parse_output "dd-write"
+    dd_read
+    parse_output "dd-read"
+} | tee ${LOG_FILE}

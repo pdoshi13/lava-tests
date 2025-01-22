@@ -24,7 +24,7 @@ install() {
     dist_name
     # shellcheck disable=SC2154
     case "${dist}" in
-      debian|ubuntu) install_deps "lsb-release procps iproute2" "${SKIP_INSTALL}";;
+      debian|ubuntu|elxr) install_deps "lsb-release procps iproute2" "${SKIP_INSTALL}";;
       fedora|centos) install_deps "redhat-lsb-core procps iproute" "${SKIP_INSTALL}";;
       unknown) warn_msg "Unsupported distro: package install skipped" ;;
     esac
@@ -45,7 +45,6 @@ create_out_dir "${OUTPUT}"
 
 install
 while [ -n "${TESTS}" ]; do
-    echo "-------------++++++++++++++++++++++++++++_________"
     test_cmd="$(echo "${TESTS}" | awk -F',' '{print $1}')"
     run "${test_cmd}"
     TESTS="$(echo "${TESTS}" | sed -r "s#${test_cmd},? *##")"
