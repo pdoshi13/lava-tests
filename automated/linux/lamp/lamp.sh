@@ -33,7 +33,7 @@ else
     dist_name
     # shellcheck disable=SC2154
     case "${dist}" in
-      debian|ubuntu)
+      debian|ubuntu|elxr)
         # Tested on Debian 9 and Ubuntu 17.10.
         pkgs="apache2 apache2-utils libapache2-mod-php mariadb-server php php-mysql"
         install_deps "curl ${pkgs}"

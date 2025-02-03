@@ -5,6 +5,7 @@
 
 OUTPUT="$(pwd)/output"
 RESULT_FILE="${OUTPUT}/result.txt"
+LOG_FILE="${OUTPUT}/output.txt"
 export RESULT_FILE
 
 # Default ethernet interface
@@ -46,4 +47,4 @@ exit_on_fail "ethernet-ping-state-UP" "ethernet-ping-route"
 ROUTE_ADDR=$(ip route list  | grep default | awk '{print $3}' | head -1)
 
 # Run the test
-run_test_case "ping -c 5 ${ROUTE_ADDR}" "ethernet-ping-route"
+run_test_case "ping -c 5 ${ROUTE_ADDR}" "ethernet-ping-route" | tee ${LOG_FILE}

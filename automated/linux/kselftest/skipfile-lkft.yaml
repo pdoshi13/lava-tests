@@ -391,3 +391,11 @@ skiplist:
     branches: all
     tests:
       - net:tls
+
+  - reason: >
+      watchdog watchdog-test hangs on all devices
+    environments: all
+    boards: all
+    branches: all
+    tests:
+      - watchdog:watchdog-test
