@@ -38,7 +38,7 @@ usage() {
                     [-n number of shard buckets to create ]
                     [-c bpf cpufreq net timers]
                     [-T cpu-hotplug:cpu-on-off-test.sh]
-                    [-t kselftest_aarch64.tar.gz | kselftest_armhf.tar.gz|kselftests_x86-64_v6.1.123.tar.gz]
+                    [-t kselftest_aarch64.tar.gz | kselftest_armhf.tar.gz| kselftests_x86-64_v6.1.123.tar.gz]
                     [-s True|False]
                     [-u url]
                     [-p path]
