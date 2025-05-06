@@ -28,7 +28,7 @@ o1metadata:
 
 params:
     SKIP_INSTALL: "False"
-    INTERFACE: "enp2s0"
+    INTERFACE:    "enp2s0"
 
 run:
     steps:
