@@ -33,7 +33,8 @@ params:
     SKIPLIST: ""
     # TESTPROG_URL: "http://testdata.validation.linaro.org/tests/kselftest/kselftest_aarch64.tar.gz"
     # TESTPROG_URL: "http://pek-lpgtest7408.wrs.com/buildarea1/SharedImage/kselftests/kselftests_x86-64_v6.1.123.tar.gz"
-    TESTPROG_URL: "http://localhost/home/lava-run/validator/kselftests_x86-64_v6.1.123.tar.gz"
+    #TESTPROG_URL: "http://localhost/home/lava-run/validator/kselftests_x86-64_v6.1.123.tar.gz"
+    TESTPROG_URL: "http://localhost/root/lava-run/validator/kselftests_x86-64_v6.1.123.tar.gz"
     KSELFTEST_PATH: "/opt/kselftests/mainline/"
 
     # SKIPFILE can be a filename from dir ./automated/linux/ltp/, an http URL,
