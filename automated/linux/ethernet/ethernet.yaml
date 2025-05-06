@@ -1,4 +1,4 @@
-metadata:
+o1metadata:
     name: ethernet
     format: "Lava-Test Test Definition 1.0"
     description: "This test checks if Ethernet is up and prints IP address."
@@ -28,7 +28,7 @@ metadata:
 
 params:
     SKIP_INSTALL: "False"
-    INTERFACE: "enp2s0"
+    INTERFACE: "eno1"
 
 run:
     steps:
